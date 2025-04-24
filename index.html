@@ -95,7 +95,7 @@
     let isRunning = false;
     let startTime;
     let lastSpeedChangeTime = 0;
-    let nextObstacleDelay = 1500 + Math.random() * 2000;
+    let nextObstacleDelay = 1200 + Math.random() * 1500;
     let lives = 3;
 
     function resizeCanvas() {
@@ -149,7 +149,7 @@
 
     function updatePlayer() {
       if (player.isJumping) {
-        player.vy += 0.4;
+        player.vy += 0.3;
         player.y += player.vy;
         if (player.y >= canvas.height / dpr - player.size) {
           player.y = canvas.height / dpr - player.size;
@@ -262,7 +262,7 @@
       if (e.key === " " || e.key === "ArrowUp") {
         if (!player.isJumping) {
           player.isJumping = true;
-          player.vy = -15;
+          player.vy = -18;
         }
       }
     });
@@ -270,7 +270,7 @@
     canvas.addEventListener("touchstart", () => {
       if (!player.isJumping) {
         player.isJumping = true;
-        player.vy = -15;
+        player.vy = -18;
       }
     });
 
