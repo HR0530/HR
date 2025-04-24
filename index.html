@@ -83,10 +83,17 @@
     const backgroundImg = new Image();
     backgroundImg.src = "background.PNG";
 
+    const canvasWidth = 800; // 固定の幅
+    const canvasHeight = 600; // 固定の高さ
+    const playerSize = 80; // プレイヤーのサイズ
+    const obstacleWidth = 40; // 障害物の幅
+    const obstacleHeight = 60; // 障害物の高さ
+    const jumpStrength = -12; // ジャンプの強さ
+
     let player = {
       x: 50,
-      y: 0,
-      size: 0,
+      y: canvasHeight - playerSize,
+      size: playerSize,
       vy: 0,
       isJumping: false,
     };
@@ -100,15 +107,8 @@
     let nextObstacleDelay = 1300 + Math.random() * 1500;
     let lives = 3;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      player.size = canvas.height * 0.1; // キャラのサイズを画面高さの10%に設定
-      player.y = canvas.height - player.size;
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     function drawBackground() {
       ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
@@ -132,11 +132,11 @@
 
       if (!updateObstacles.lastTime) updateObstacles.lastTime = now;
       if (now - updateObstacles.lastTime > nextObstacleDelay) {
-        const height = canvas.height * 0.03; // 高さを画面高さの3%
-        const width = canvas.width * 0.04; // 幅を画面幅の4%
+        const height = obstacleHeight;
+        const width = obstacleWidth;
         obstacles.push({
           x: canvas.width,
-          y: canvas.height - height,
+          y: canvasHeight - height,
           width: width,
           height: height
         });
@@ -149,8 +149,8 @@
       if (player.isJumping) {
         player.vy += 0.5; // 重力
         player.y += player.vy;
-        if (player.y >= canvas.height - player.size) {
-          player.y = canvas.height - player.size;
+        if (player.y >= canvasHeight - player.size) {
+          player.y = canvasHeight - player.size;
           player.vy = 0;
           player.isJumping = false;
         }
@@ -171,7 +171,7 @@
             endGame();
           } else {
             obstacles = [];
-            player.y = canvas.height - player.size;
+            player.y = canvasHeight - player.size;
             player.vy = 0;
             player.isJumping = false;
           }
@@ -227,7 +227,7 @@
     function startGame() {
       isRunning = true;
       obstacles = [];
-      player.y = canvas.height - player.size;
+      player.y = canvasHeight - player.size;
       player.vy = 0;
       player.isJumping = false;
       gameSpeed = 3;
@@ -260,7 +260,7 @@
       if (e.key === " " || e.key === "ArrowUp") {
         if (!player.isJumping) {
           player.isJumping = true;
-          player.vy = -window.innerHeight * 0.01; // ジャンプを抑えた
+          player.vy = jumpStrength;
         }
       }
     });
@@ -268,7 +268,7 @@
     canvas.addEventListener("touchstart", () => {
       if (!player.isJumping) {
         player.isJumping = true;
-        player.vy = -window.innerHeight * 0.01; // タッチでも同様に調整
+        player.vy = jumpStrength;
       }
     });
 
