@@ -149,7 +149,7 @@
 
     function updatePlayer() {
       if (player.isJumping) {
-        player.vy += 0.7;
+        player.vy += 0.4;
         player.y += player.vy;
         if (player.y >= canvas.height / dpr - player.size) {
           player.y = canvas.height / dpr - player.size;
