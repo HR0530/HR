@@ -2,18 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <title>わいちゃんゲーム</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       font-family: sans-serif;
+      touch-action: manipulation;
     }
 
     #gameCanvas {
       background-color: #000;
       display: block;
+      touch-action: manipulation;
     }
 
     #startButton, #clearMessage {
@@ -21,44 +23,38 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      padding: 1rem 2rem;
-      font-size: 1.5rem;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.8rem;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       display: none;
       z-index: 10;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     #startButton {
       display: block;
     }
 
-    #timer {
+    #timer, #lives {
       position: absolute;
       top: 10px;
-      right: 20px;
-      font-size: 1.2rem;
+      font-size: 1.6rem;
       background-color: rgba(0, 0, 0, 0.5);
       color: white;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
       z-index: 10;
-      display: none;
+    }
+
+    #timer {
+      right: 15px;
     }
 
     #lives {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      font-size: 1.2rem;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      z-index: 10;
-      display: none;
+      left: 15px;
     }
   </style>
 </head>
@@ -76,6 +72,8 @@
     const clearMessage = document.getElementById("clearMessage");
     const timerDisplay = document.getElementById("timer");
     const livesDisplay = document.getElementById("lives");
+
+    const dpr = window.devicePixelRatio || 1;
 
     const playerImg = new Image();
     playerImg.src = "player.JPG";
@@ -97,13 +95,18 @@
     let isRunning = false;
     let startTime;
     let lastSpeedChangeTime = 0;
-    let nextObstacleDelay = 1300 + Math.random() * 1500; // ← 間隔を広く
+    let nextObstacleDelay = 1500 + Math.random() * 2000;
     let lives = 3;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      player.y = canvas.height - player.size;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      player.size = Math.min(canvas.width, canvas.height) * 0.15;
+      player.y = canvas.height / dpr - player.size;
     }
 
     window.addEventListener("resize", resizeCanvas);
@@ -131,25 +134,25 @@
 
       if (!updateObstacles.lastTime) updateObstacles.lastTime = now;
       if (now - updateObstacles.lastTime > nextObstacleDelay) {
-        const height = 30 + Math.random() * 50;
-        const width = 20 + Math.random() * 30; // ← 幅を小さく
+        const height = 20 + Math.random() * 20;
+        const width = 20 + Math.random() * 20;
         obstacles.push({
-          x: canvas.width,
-          y: canvas.height - height,
+          x: canvas.width / dpr,
+          y: canvas.height / dpr - height,
           width: width,
           height: height
         });
         updateObstacles.lastTime = now;
-        nextObstacleDelay = 1300 + Math.random() * 1500; // ← 間隔広め
+        nextObstacleDelay = 1500 + Math.random() * 2000;
       }
     }
 
     function updatePlayer() {
       if (player.isJumping) {
-        player.vy += 0.5;
+        player.vy += 0.7;
         player.y += player.vy;
-        if (player.y >= canvas.height - player.size) {
-          player.y = canvas.height - player.size;
+        if (player.y >= canvas.height / dpr - player.size) {
+          player.y = canvas.height / dpr - player.size;
           player.vy = 0;
           player.isJumping = false;
         }
@@ -170,7 +173,7 @@
             endGame();
           } else {
             obstacles = [];
-            player.y = canvas.height - player.size;
+            player.y = canvas.height / dpr - player.size;
             player.vy = 0;
             player.isJumping = false;
           }
@@ -226,14 +229,14 @@
     function startGame() {
       isRunning = true;
       obstacles = [];
-      player.y = canvas.height - player.size;
+      player.y = canvas.height / dpr - player.size;
       player.vy = 0;
       player.isJumping = false;
       gameSpeed = 3;
       startTime = Date.now();
       lastSpeedChangeTime = 0;
       updateObstacles.lastTime = Date.now();
-      nextObstacleDelay = 1300 + Math.random() * 1500;
+      nextObstacleDelay = 1500 + Math.random() * 2000;
       lives = 3;
       updateLivesDisplay();
       startButton.style.display = "none";
@@ -259,7 +262,7 @@
       if (e.key === " " || e.key === "ArrowUp") {
         if (!player.isJumping) {
           player.isJumping = true;
-          player.vy = -14; // ← ジャンプを少し抑えた
+          player.vy = -15;
         }
       }
     });
@@ -267,7 +270,7 @@
     canvas.addEventListener("touchstart", () => {
       if (!player.isJumping) {
         player.isJumping = true;
-        player.vy = -14; // ← タッチでも同様に調整
+        player.vy = -15;
       }
     });
 
