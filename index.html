@@ -132,8 +132,8 @@
 
       if (!updateObstacles.lastTime) updateObstacles.lastTime = now;
       if (now - updateObstacles.lastTime > nextObstacleDelay) {
-        const height = canvas.height * (0.05 + Math.random() * 0.05); // 高さを画面高さの5%〜10%に設定
-        const width = canvas.width * (0.02 + Math.random() * 0.03); // 幅を画面幅の2%〜5%に設定
+        const height = canvas.height * 0.03; // 高さを画面高さの3%
+        const width = canvas.width * 0.04; // 幅を画面幅の4%
         obstacles.push({
           x: canvas.width,
           y: canvas.height - height,
@@ -180,6 +180,101 @@
       }
     }
 
-    function
-::contentReference[oaicite:9]{index=9}
- 
+    function changeSpeed() {
+      const now = (Date.now() - startTime) / 1000;
+      if (now - lastSpeedChangeTime >= 30) {
+        lastSpeedChangeTime = now;
+        const speeds = [3, 5, 7];
+        gameSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+      }
+    }
+
+    function updateTimerDisplay() {
+      const remaining = Math.max(0, 180 - Math.floor((Date.now() - startTime) / 1000));
+      const minutes = Math.floor(remaining / 60);
+      const seconds = remaining % 60;
+      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateLivesDisplay() {
+      livesDisplay.textContent = "♥".repeat(lives);
+    }
+
+    function draw() {
+      drawBackground();
+      drawPlayer();
+      drawObstacles();
+    }
+
+    function update() {
+      gameTime = (Date.now() - startTime) / 1000;
+      if (gameTime >= 180) return endGame(true);
+      changeSpeed();
+      updatePlayer();
+      updateObstacles();
+      checkCollision();
+      updateTimerDisplay();
+    }
+
+    function gameLoop() {
+      if (!isRunning) return;
+      update();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      isRunning = true;
+      obstacles = [];
+      player.y = canvas.height - player.size;
+      player.vy = 0;
+      player.isJumping = false;
+      gameSpeed = 3;
+      startTime = Date.now();
+      lastSpeedChangeTime = 0;
+      updateObstacles.lastTime = Date.now();
+      nextObstacleDelay = 1300 + Math.random() * 1500;
+      lives = 3;
+      updateLivesDisplay();
+      startButton.style.display = "none";
+      clearMessage.style.display = "none";
+      timerDisplay.style.display = "block";
+      livesDisplay.style.display = "block";
+      gameLoop();
+    }
+
+    function endGame(clear = false) {
+      isRunning = false;
+      timerDisplay.style.display = "none";
+      livesDisplay.style.display = "none";
+      if (clear) {
+        clearMessage.style.display = "block";
+      } else {
+        alert("ゲームオーバー！");
+        startButton.style.display = "block";
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === " " || e.key === "ArrowUp") {
+        if (!player.isJumping) {
+          player.isJumping = true;
+          player.vy = -window.innerHeight * 0.01; // ジャンプを抑えた
+        }
+      }
+    });
+
+    canvas.addEventListener("touchstart", () => {
+      if (!player.isJumping) {
+        player.isJumping = true;
+        player.vy = -window.innerHeight * 0.01; // タッチでも同様に調整
+      }
+    });
+
+    startButton.addEventListener("click", () => {
+      startGame();
+    });
+  </script>
+</body>
+</html>
