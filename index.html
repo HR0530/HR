@@ -259,7 +259,7 @@
       if (e.key === " " || e.key === "ArrowUp") {
         if (!player.isJumping) {
           player.isJumping = true;
-          player.vy = -11; // ← ジャンプを少し抑えた
+          player.vy = -14; // ← ジャンプを少し抑えた
         }
       }
     });
@@ -267,7 +267,7 @@
     canvas.addEventListener("touchstart", () => {
       if (!player.isJumping) {
         player.isJumping = true;
-        player.vy = -11; // ← タッチでも同様に調整
+        player.vy = -14; // ← タッチでも同様に調整
       }
     });
 
