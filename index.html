@@ -55,13 +55,12 @@
             z-index: 10;
             display: flex;
             gap: 8px;
+            font-size: 1.5rem;
         }
 
         .life {
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
+            color: red;
+            font-size: 2rem;
         }
     </style>
 </head>
@@ -79,6 +78,12 @@
         const clearMessage = document.getElementById("clearMessage");
         const timerDisplay = document.getElementById("timer");
         const livesDisplay = document.getElementById("lives");
+
+        const playerImage = new Image();
+        playerImage.src = 'player.JPG';  // プレイヤーキャラクター画像
+
+        const backgroundImage = new Image();
+        backgroundImage.src = 'background.PNG';  // 背景画像
 
         const player = {
             x: 50,
@@ -107,8 +112,8 @@
         resizeCanvas();
 
         function drawPlayer() {
-            ctx.fillStyle = "blue";
-            ctx.fillRect(player.x, player.y, player.size, player.size);
+            // プレイヤー画像を描画
+            ctx.drawImage(playerImage, player.x, player.y, player.size, player.size);
         }
 
         function drawObstacles() {
@@ -175,9 +180,10 @@
         function updateLivesDisplay() {
             livesDisplay.innerHTML = "";
             for (let i = 0; i < lives; i++) {
-                const dot = document.createElement("div");
-                dot.className = "life";
-                livesDisplay.appendChild(dot);
+                const heart = document.createElement("div");
+                heart.className = "life";
+                heart.textContent = "♥";  // 残機はハートで表示
+                livesDisplay.appendChild(heart);
             }
         }
 
@@ -199,6 +205,7 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 背景画像を描画
             drawPlayer();
             drawObstacles();
         }
