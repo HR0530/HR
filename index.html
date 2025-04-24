@@ -83,23 +83,17 @@
     const backgroundImg = new Image();
     backgroundImg.src = "background.PNG";
 
-    const canvasWidth = 800; // 固定の幅
-    const canvasHeight = 600; // 固定の高さ
-    const playerSize = 80; // プレイヤーのサイズ
-    const obstacleWidth = 40; // 障害物の幅
-    const obstacleHeight = 60; // 障害物の高さ
-    const jumpStrength = -12; // ジャンプの強さ
-
+    let canvasWidth, canvasHeight;
+    let playerSize, obstacleWidth, obstacleHeight, jumpStrength;
+    let gameSpeed = 3;
+    let obstacles = [];
     let player = {
       x: 50,
-      y: canvasHeight - playerSize,
-      size: playerSize,
+      y: 0,
+      size: 0,
       vy: 0,
       isJumping: false,
     };
-
-    let obstacles = [];
-    let gameSpeed = 3;
     let gameTime = 0;
     let isRunning = false;
     let startTime;
@@ -107,8 +101,24 @@
     let nextObstacleDelay = 1300 + Math.random() * 1500;
     let lives = 3;
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    function resizeCanvas() {
+      // スマホの画面サイズに合わせてcanvasのサイズを調整
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      // プレイヤー、障害物のサイズを画面の幅に合わせて調整
+      playerSize = canvasWidth * 0.12; // 画面幅の12%
+      obstacleWidth = canvasWidth * 0.05; // 画面幅の5%
+      obstacleHeight = playerSize * 0.8; // プレイヤーのサイズの80%
+      jumpStrength = -playerSize * 0.15; // ジャンプの強さを調整
+
+      player.y = canvasHeight - player.size;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
     function drawBackground() {
       ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
@@ -147,7 +157,7 @@
 
     function updatePlayer() {
       if (player.isJumping) {
-        player.vy += 0.5; // 重力
+        player.vy += 0.5;
         player.y += player.vy;
         if (player.y >= canvasHeight - player.size) {
           player.y = canvasHeight - player.size;
